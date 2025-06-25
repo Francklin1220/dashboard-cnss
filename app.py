@@ -610,104 +610,48 @@ def create_main_layout():
             # Onglet Machine Learning
             # autres onglets...
             dbc.Tab(label="Machine Learning", children=[
-    html.Div([
-        html.H2("🧠 Machine Learning - Analyse Prédictive", className="text-primary mb-4 text-center"),
-
-        # ======== Clustering ========
-        dbc.Card([
-            dbc.CardHeader("🔍 Clustering des Modes de Paiement", className="bg-primary text-white"),
-            dbc.CardBody([
-                html.P("Cette analyse identifie des groupes similaires de paiements basés sur les caractéristiques financières."),
-                dbc.Button("Exécuter le Clustering", id="run-clustering", color="primary", className="mb-3"),
-                dcc.Graph(id='clustering-graph'),
                 html.Div([
-                    html.H5("Commentaire", className="text-secondary"),
-                    html.P(id='default-clustering-comment', children="Les clusters identifient des groupes d'entreprises avec des comportements de paiement similaires."),
-                    dcc.Textarea(
-                        id='comment-clustering-graph',
-                        placeholder='Ajoutez vos notes ici...',
-                        style={'width': '100%', 'height': 100},
-                        className="mt-2"
-                    )
-                ]),
-                html.Div(id='cluster-info', className="mt-3")
-            ])
-        ], className="mb-4 shadow-sm"),
+                    html.H3("Outils de Machine Learning pour l'analyse prédictive", className="text-primary mb-3"),
 
-        # ======== Entraînement modèle ========
-        dbc.Card([
-            dbc.CardHeader("📈 Entraînement d’un Modèle de Prédiction", className="bg-info text-white"),
-            dbc.CardBody([
-                html.P("Ce modèle prédit le mode de paiement probable à partir des caractéristiques financières."),
-                dbc.Button("Entraîner le Modèle", id="train-model", color="info", className="mb-3"),
-                html.Div(id='model-results', className="mb-4"),
-                dcc.Graph(id='feature-importance-graph'),
-                html.Div([
-                    html.H5("Commentaire", className="text-secondary mt-3"),
-                    html.P(id='default-feature-comment', children="L’importance des variables aide à comprendre les facteurs clés influençant le mode de paiement."),
-                    dcc.Textarea(
-                        id='comment-feature-graph',
-                        placeholder='Ajoutez vos notes ici...',
-                        style={'width': '100%', 'height': 100},
-                        className="mt-2"
-                    )
-                ])
-            ])
-        ], className="mb-4 shadow-sm"),
+                    html.Div([
+                        html.Label("Choisir un algorithme :"),
+                        dcc.Dropdown(
+                            id='ml-model-selector',
+                            options=[
+                                {'label': 'Régression Linéaire', 'value': 'linear_regression'},
+                                {'label': 'Forêt Aléatoire (Random Forest)', 'value': 'random_forest'},
+                                {'label': 'K-Means Clustering', 'value': 'kmeans'},
+                                {'label': 'SVM', 'value': 'svm'}
+                            ],
+                            placeholder="Sélectionnez un modèle de Machine Learning"
+                        ),
+                    ], className="mb-3"),
 
-        # ======== Prédiction Interactive ========
-        dbc.Card([
-            dbc.CardHeader("🎯 Prédiction Interactive", className="bg-success text-white"),
-            dbc.CardBody([
-                html.P("Testez différentes combinaisons pour prédire le mode de paiement probable :"),
+                    html.Div([
+                        html.Label("Variable cible (à prédire) :"),
+                        dcc.Dropdown(
+                            id='target-variable',
+                            options=[{'label': col, 'value': col} for col in data.select_dtypes(include='number').columns],
+                            placeholder="Choisir la variable cible"
+                        )
+                    ], className="mb-3"),
 
-                dbc.Row([
-                    dbc.Col([
-                        dbc.Label("💼 Masse Salariale"),
-                        dbc.Input(id='input-masse', type='number', value=1000000)
-                    ], md=4),
-                    dbc.Col([
-                        dbc.Label("💰 Principal"),
-                        dbc.Input(id='input-principal', type='number', value=200000)
-                    ], md=4),
-                    dbc.Col([
-                        dbc.Label("💵 Montant Payé"),
-                        dbc.Input(id='input-montant', type='number', value=200000)
-                    ], md=4)
-                ], className="mb-3"),
+                    html.Div([
+                        html.Label("Variables explicatives :"),
+                        dcc.Dropdown(
+                            id='feature-variables',
+                            options=[{'label': col, 'value': col} for col in data.select_dtypes(include='number').columns],
+                            multi=True,
+                            placeholder="Choisir les variables explicatives"
+                        )
+                    ], className="mb-3"),
 
-                dbc.Row([
-                    dbc.Col([
-                        dbc.Label("⚠️ Pénalité Taxation"),
-                        dbc.Input(id='input-taxation', type='number', value=0)
-                    ], md=4),
-                    dbc.Col([
-                        dbc.Label("⚠️ Pénalité Majoration"),
-                        dbc.Input(id='input-majoration', type='number', value=0)
-                    ], md=4),
-                    dbc.Col([
-                        dbc.Label("📊 Cluster"),
-                        dbc.Input(id='input-cluster', type='number', value=0)
-                    ], md=4)
-                ], className="mb-3"),
+                    dbc.Button("Lancer l'entraînement", id='train-model-btn', color='primary'),
 
-                dbc.Button("Prédire", id="predict-button", color="success", className="mb-3"),
-                html.Div(id='prediction-output', className="alert alert-success mt-3"),
-
-                html.Div([
-                    html.H5("Commentaire", className="text-secondary mt-3"),
-                    html.P("Utilisez cette section pour tester l’effet de différents paramètres sur la prédiction."),
-                    dcc.Textarea(
-                        id='comment-prediction',
-                        placeholder='Ajoutez vos notes ici...',
-                        style={'width': '100%', 'height': 100},
-                        className="mt-2"
-                    )
-                ])
-            ])
-        ], className="mb-4 shadow-sm")
-    ], className="container")
-            ])
+                    html.Div(id='ml-results', className="mt-4")
+                ], className="container")
+            
+        ], className="mb-4")
     
     ], className="container-fluid bg-white"),
         ########################################
@@ -967,7 +911,7 @@ def update_risk_metrics(n):
     if global_cluster_model is not None:
         clustered_data = data.copy()
         clustered_data['Cluster'] = global_cluster_model.predict(prepare_clustering_data(clustered_data))
-        ##risk_count = clustered_data[clustered_data['risque_retard'] == 'Élevé'].shape[0] 
+        risk_count = clustered_data[clustered_data['risque_retard'] == 'Élevé'].shape[0]
         anomaly_count = clustered_data[clustered_data['anomalie'] == -1].shape[0]
         return risk_count, anomaly_count
     return "-", "-"
